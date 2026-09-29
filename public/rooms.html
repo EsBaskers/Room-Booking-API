@@ -8,3 +8,70 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<header>
+  <h1>Room Booking</h1>
+  <p>Pick a room, check its day, book a time.</p>
+</header>
+
+<div class="layout">
+  <aside>
+    <div class="panel" id="rooms" aria-label="Rooms"></div>
+    <div class="panel" style="margin-top:16px;padding:6px">
+      <details>
+        <summary>Add a room</summary>
+        <form id="roomForm">
+          <label>Name<input name="name" required></label>
+          <label>Capacity<input name="capacity" type="number" min="1" required></label>
+          <label>Location<input name="location" required></label>
+          <button class="btn">Add room</button>
+          <p class="msg" id="roomMsg" hidden></p>
+        </form>
+      </details>
+    </div>
+  </aside>
+
+  <main>
+    <section class="panel">
+      <div class="top">
+        <div>
+          <h2 id="roomTitle">Loading rooms…</h2>
+          <p id="roomMeta"></p>
+        </div>
+        <label>Day<input type="date" id="date"></label>
+      </div>
+      <div class="timeline" id="timeline"></div>
+      <p class="empty" id="dayEmpty" hidden>No bookings on this day. Click an hour to start a booking, or click a booking to edit it.</p>
+    </section>
+
+    <section class="panel">
+      <h2 id="formTitle">Book this room</h2>
+      <form id="bookForm">
+        <input type="hidden" name="bookingId" value="">
+        <div class="row">
+          <label>Title<input name="title" required></label>
+          <label>Booked by<input name="booked_by" required></label>
+        </div>
+        <div class="row">
+          <label>Day<input type="date" name="day" required></label>
+          <label>Start<input type="time" name="start" min="07:00" max="21:00" required></label>
+          <label>End<input type="time" name="end" min="07:00" max="21:00" required></label>
+        </div>
+        <p class="hint">Bookings must fall between 07:00 and 21:00.</p>
+        <div class="row" style="grid-template-columns:auto auto">
+          <button class="btn" id="formSubmit">Book room</button>
+          <button type="button" class="btn secondary" id="formCancel" hidden>Cancel edit</button>
+        </div>
+        <p class="msg" id="bookMsg" hidden></p>
+      </form>
+    </section>
+
+    <section class="panel">
+      <h2>Next bookings</h2>
+      <ul class="up" id="upcoming"></ul>
+    </section>
+  </main>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

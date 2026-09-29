@@ -12,3 +12,5 @@ Route::get('/rooms/{room}/current', [RoomController::class, 'current']);
 Route::get('/rooms/{room}/upcoming', [RoomController::class, 'upcoming']);
 
 Route::post('/bookings', [BookingController::class, 'store']);
+Route::patch('/bookings/{booking}', [BookingController::class, 'update']);
+Route::delete('/bookings/{booking}', [BookingController::class, 'destroy']);

@@ -23,14 +23,7 @@ class BookingController extends Controller
                 return response()->json(['message' => 'Room is not active.'], 422);
             }
 
-            // Overlap: existing starts before the new one ends AND ends after the new one starts.
-            // Strict < and > allow back-to-back bookings (10:00-11:00 then 11:00-12:00).
-            $overlap = Booking::where('room_id', $room->id)
-                ->where('starts_at', '<', $data['ends_at'])
-                ->where('ends_at', '>', $data['starts_at'])
-                ->exists();
-
-            if ($overlap) {
+            if ($this->overlaps($data['room_id'], $data['starts_at'], $data['ends_at'])) {
                 return response()->json(['message' => 'Room is already booked for this period.'], 422);
             }
 
@@ -38,5 +31,47 @@ class BookingController extends Controller
 
             return response()->json($booking, 201);
         });
+    }
+
+    public function update(StoreBookingRequest $request, Booking $booking): JsonResponse
+    {
+        $data = $request->validated();
+
+        return DB::transaction(function () use ($data, $booking) {
+            $room = Room::lockForUpdate()->find($data['room_id']);
+
+            if (! $room->is_active) {
+                return response()->json(['message' => 'Room is not active.'], 422);
+            }
+
+            // Exclude this booking itself from the overlap check
+            if ($this->overlaps($data['room_id'], $data['starts_at'], $data['ends_at'], $booking->id)) {
+                return response()->json(['message' => 'Room is already booked for this period.'], 422);
+            }
+
+            $booking->update($data);
+
+            return response()->json($booking->fresh());
+        });
+    }
+
+    public function destroy(Booking $booking): JsonResponse
+    {
+        $booking->delete();
+
+        return response()->json(null, 204);
+    }
+
+    /**
+     * Two periods overlap when an existing one starts before the new one ends
+     * AND ends after the new one starts. Strict < and > allow back-to-back bookings.
+     */
+    private function overlaps(int $roomId, string $startsAt, string $endsAt, ?int $excludeBookingId = null): bool
+    {
+        return Booking::where('room_id', $roomId)
+            ->when($excludeBookingId, fn ($q) => $q->where('id', '!=', $excludeBookingId))
+            ->where('starts_at', '<', $endsAt)
+            ->where('ends_at', '>', $startsAt)
+            ->exists();
     }
 }

@@ -41,6 +41,7 @@ class RoomController extends Controller
             ->orderBy('starts_at')
             ->get()
             ->map(fn ($b) => [
+                'id' => $b->id,
                 'title' => $b->title,
                 'booked_by' => $b->booked_by,
                 'starts_at' => $b->starts_at->format('H:i'),
