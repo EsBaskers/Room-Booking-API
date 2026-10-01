@@ -1,5 +1,6 @@
 // This file must sit in Laravel's public/ folder so it shares the origin of the API.
 const API = '/api';
+const API_KEY = '1234567890';
 const START_HOUR = 7, END_HOUR = 21, ROW = 44;
 const $ = s => document.querySelector(s);
 let rooms = [], room = null;
